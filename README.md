@@ -1,43 +1,84 @@
-# Astro Starter Kit: Minimal
+# Kinetix
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Kinetix is an advanced educational platform aimed at making learning engaging through interactive components and a dedicated creative studio. It leverages the power of Astro, React, and modern web technologies to deliver a seamless and performant user experience.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 🌟 Key Features
 
-## 🚀 Project Structure
+*   **Kinetix Studio**: A powerful in-browser content creation tool.
+    *   **Layer-based Editing**: Manage scenes with a familiar layers panel.
+    *   **Animated Components**: Drag-and-drop animated elements like Progress Bars, Typewriter Code blocks, and Counters.
+    *   **Video Export**: Export your creations as WebM or MP4 videos directly from the browser (client-side rendering).
+    *   **Real-time Preview**: Playback and scrub through your timeline.
+*   **Education Hub**: A structured learning environment with courses and lessons.
+*   **Interactive Blog**: Engaging content enhanced with custom components.
+*   **Dark Mode**: Fully supported dark/light theme toggle.
 
-Inside of your Astro project, you'll see the following folders and files:
+## 🛠️ Tech Stack
+
+*   **Framework**: [Astro](https://astro.build/) (v5)
+*   **UI Library**: [React](https://react.dev/)
+*   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+*   **State Management**: [Nanostores](https://github.com/nanostores/nanostores)
+*   **Icons**: [Lucide React](https://lucide.dev/)
+*   **Diagrams**: Mermaid, Markmap
+*   **Video Export**: `html-to-image` + `downloadjs` + `canvas` recording techniques.
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+*   Node.js (v18 or higher)
+*   npm (v9 or higher)
+
+### Installation
+
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/yourusername/kinetix.git
+    cd kinetix
+    ```
+
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+
+3.  Start the development server:
+    ```bash
+    npm run dev
+    ```
+    Open `http://localhost:4321` in your browser.
+
+## 🧞 Scripts
+
+| Command | Action |
+| :--- | :--- |
+| `npm run dev` | Starts local dev server at `localhost:4321` |
+| `npm run build` | Build your production site to `./dist/` |
+| `npm run preview` | Preview your build locally, before deploying |
+| `npm run astro ...` | Run CLI commands like `astro add`, `astro check` |
+
+## 📂 Project Structure
 
 ```text
 /
-├── public/
+├── public/             # Static assets
 ├── src/
-│   └── pages/
-│       └── index.astro
+│   ├── components/     # Reusable UI components
+│   │   ├── studio/     # Studio-specific components (Layers, Sidebar, etc.)
+│   │   └── ...
+│   ├── content/        # Content collections (Blog, Education)
+│   ├── layouts/        # Page layouts
+│   ├── pages/          # Astro pages (Routes)
+│   ├── styles/         # Global styles
+│   └── utils/          # Helper functions and Studio Engine logic
 └── package.json
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 🤝 Contributing
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-Any static assets, like images, can be placed in the `public/` directory.
+## 📄 License
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+This project is licensed under the MIT License.
