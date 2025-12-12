@@ -54,6 +54,7 @@ export class StudioEngine {
     }
 
     addObject(obj: SceneObject) {
+        if (obj.visible === undefined) obj.visible = true; // Default to visible
         this.objects.push(obj);
         this.selectObject(obj.id);
         if (this.onObjectListChange) this.onObjectListChange(this.objects);
@@ -69,10 +70,26 @@ export class StudioEngine {
         this.draw(this.currentTime);
     }
 
+    toggleVisibility(id: string) {
+        const obj = this.getObject(id);
+        if (obj) {
+            obj.visible = !obj.visible;
+            if (this.onObjectListChange) this.onObjectListChange(this.objects);
+            this.draw(this.currentTime);
+
+            // If hiding selected object, deselect? Optionally. 
+            // For now, let's keep it selected in properties but maybe hide interaction box.
+            if (!obj.visible && this.selectedObjectId === id) {
+                this.selectObject(null);
+            }
+        }
+    }
+
     duplicateObject(id: string) {
         const obj = this.getObject(id);
         if (obj && obj.clone) {
             const newObj = obj.clone();
+            newObj.visible = true; // Always visible on clone
             this.addObject(newObj);
         }
     }
@@ -117,6 +134,12 @@ export class StudioEngine {
     }
 
     selectObject(id: string | null) {
+        // Validation: Don't select invisible objects
+        if (id) {
+            const obj = this.getObject(id);
+            if (obj && obj.visible === false) return;
+        }
+
         // this.selectedObjectId = id; // Local obsolete if purely relying on store, but engine usually authoritative
         // We will subscribe to store in UI, but engine updates store here
         selectedObjectId.set(id);
@@ -146,6 +169,10 @@ export class StudioEngine {
         for (const obj of this.objects) {
             // Check visibility based on time?
             // Simple: Just draw everything, let them handle their own animation state
+
+            // VISIBILITY CHECK
+            if (obj.visible === false) continue;
+
             this.ctx.save();
             // Global transform if needed
             obj.draw(this.ctx, time);
@@ -256,7 +283,7 @@ export class StudioEngine {
             const currentSelId = selectedObjectId.get();
             const currentSelObj = currentSelId ? this.getObject(currentSelId) : null;
 
-            if (currentSelObj && !this.isPreviewing) {
+            if (currentSelObj && !this.isPreviewing && currentSelObj.visible !== false) {
                 const handles = this.getHandleRects(currentSelObj);
                 for (const [key, h] of Object.entries(handles)) {
                     if (x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h) {
@@ -276,6 +303,8 @@ export class StudioEngine {
             for (let i = this.objects.length - 1; i >= 0; i--) {
                 // Simple containment check - assumes rect for now
                 const obj = this.objects[i];
+                if (obj.visible === false) continue; // Skip invisible
+
                 if (x >= obj.x && x <= obj.x + obj.width && y >= obj.y && y <= obj.y + obj.height) {
                     clickedId = obj.id;
                     break;
@@ -305,7 +334,7 @@ export class StudioEngine {
                 let cursor = 'default';
 
                 // Check Handles
-                if (currentSelObj && !this.isPreviewing) {
+                if (currentSelObj && !this.isPreviewing && currentSelObj.visible !== false) {
                     const handles = this.getHandleRects(currentSelObj);
                     if (x >= handles.tl.x && x <= handles.tl.x + handles.tl.w && y >= handles.tl.y && y <= handles.tl.y + handles.tl.h) cursor = 'nwse-resize';
                     else if (x >= handles.br.x && x <= handles.br.x + handles.br.w && y >= handles.br.y && y <= handles.br.y + handles.br.h) cursor = 'nwse-resize';
@@ -320,6 +349,8 @@ export class StudioEngine {
                     // Check other objects hover
                     for (let i = this.objects.length - 1; i >= 0; i--) {
                         const obj = this.objects[i];
+                        if (obj.visible === false) continue;
+
                         if (x >= obj.x && x <= obj.x + obj.width && y >= obj.y && y <= obj.y + obj.height) {
                             cursor = 'pointer'; // Clickable
                             break;
@@ -421,11 +452,6 @@ export class StudioEngine {
             y: (e.clientY - rect.top) * scaleY
         };
     }
-
-    // --- Interaction ---
-
-    // ... interaction setup ... (omitted for brevity in this replace block, can't easily jump over) 
-    // Actually, I should just modify the draw function and add the new methods.
 
     // --- Preview ---
     isPreviewing = false;

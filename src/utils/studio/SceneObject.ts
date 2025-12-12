@@ -21,6 +21,9 @@ export interface SceneObject {
     // Optional Name (for Layers Panel)
     name?: string;
 
+    // Visibility
+    visible?: boolean;
+
     // Clone (for Duplication)
     clone?(): SceneObject;
 }
