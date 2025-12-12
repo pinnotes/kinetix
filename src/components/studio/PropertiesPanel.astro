@@ -104,8 +104,45 @@
                                 <option value="rotate-in" ${val === "rotate-in" ? "selected" : ""}>Rotate In</option>
                             </select>
                             `
-                                    : key === "fontFamily"
+                                    : key === "chartType"
                                       ? `
+                            <select data-key="${key}" class="prop-input w-full bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs rounded-lg border-0 ring-1 ring-transparent hover:ring-gray-200 dark:hover:ring-gray-700 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-blue-500 px-3 py-2 outline-none transition-all font-medium cursor-pointer appearance-none">
+                                <option value="bar" ${val === "bar" ? "selected" : ""}>Bar Chart</option>
+                                <option value="line" ${val === "line" ? "selected" : ""}>Line Chart</option>
+                                <option value="area" ${val === "area" ? "selected" : ""}>Area Chart</option>
+                                <option value="pie" ${val === "pie" ? "selected" : ""}>Pie Chart</option>
+                            </select>
+                            `
+                                      : key === "styleVariant"
+                                        ? `
+                            <select data-key="${key}" class="prop-input w-full bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs rounded-lg border-0 ring-1 ring-transparent hover:ring-gray-200 dark:hover:ring-gray-700 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-blue-500 px-3 py-2 outline-none transition-all font-medium cursor-pointer appearance-none">
+                                <option value="clean" ${val === "clean" ? "selected" : ""}>Clean</option>
+                                <option value="scribble" ${val === "scribble" ? "selected" : ""}>Scribble</option>
+                                <option value="vox" ${val === "vox" ? "selected" : ""}>Vox Style</option>
+                            </select>
+                            `
+                                        : key === "data"
+                                          ? `
+                            <div class="flex flex-col gap-2">
+                                <div id="chart-data-list" class="flex flex-col gap-2">
+                                    <!-- Populated via JS for interactivity, but we render initial state here if possible or just use a container -->
+                                </div>
+                                <button id="btn-add-data" class="text-xs text-blue-600 font-medium hover:text-blue-700 text-left flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                    Add Item
+                                </button>
+                                <textarea data-key="${key}" class="hidden prop-input-data-json">${val}</textarea>
+                            </div>
+                            `
+                                          : key === "showLabels"
+                                            ? `
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" data-key="${key}" ${val ? "checked" : ""} class="prop-input w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-xs text-gray-500">Show Labels</span>
+                            </div>
+                            `
+                                            : key === "fontFamily"
+                                              ? `
                             <select data-key="${key}" class="prop-input w-full bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs rounded-lg border-0 ring-1 ring-transparent hover:ring-gray-200 dark:hover:ring-gray-700 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-blue-500 px-3 py-2 outline-none transition-all font-medium cursor-pointer appearance-none" style="font-family: '${val}'">
                                 <option value="Poppins" style="font-family: 'Poppins'">Poppins</option>
                                 <option value="Inter" style="font-family: 'Inter'">Inter</option>
@@ -119,8 +156,8 @@
                                 <option value="Montserrat" style="font-family: 'Montserrat'">Montserrat</option>
                             </select>
                             `
-                                      : key === "fontWeight"
-                                        ? `
+                                              : key === "fontWeight"
+                                                ? `
                             <select data-key="${key}" class="prop-input w-full bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs rounded-lg border-0 ring-1 ring-transparent hover:ring-gray-200 dark:hover:ring-gray-700 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-blue-500 px-3 py-2 outline-none transition-all font-medium cursor-pointer appearance-none">
                                 <option value="100" ${val === "100" ? "selected" : ""}>Thin 100</option>
                                 <option value="300" ${val === "300" ? "selected" : ""}>Light 300</option>
@@ -130,10 +167,10 @@
                                 <option value="900" ${val === "900" ? "selected" : ""}>Black 900</option>
                             </select>
                             `
-                                        : key.includes("Blur") ||
-                                            key.includes("Offset") ||
-                                            key.includes("Spacing")
-                                          ? `
+                                                : key.includes("Blur") ||
+                                                    key.includes("Offset") ||
+                                                    key.includes("Spacing")
+                                                  ? `
                             <div class="flex items-center gap-2 w-full">
                                 <input type="range" 
                                     min="-50" max="50" step="1"
@@ -146,7 +183,7 @@
                                     class="prop-input w-12 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs rounded-lg border-0 ring-1 ring-transparent hover:ring-gray-200 dark:hover:ring-gray-700 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-blue-500 px-1 py-1 text-center outline-none transition-all font-medium">
                             </div>
                             `
-                                          : `
+                                                  : `
                             <input type="${isNum ? "number" : "text"}" 
                                    data-key="${key}" 
                                    value="${val}" 
@@ -177,7 +214,11 @@
                 input.addEventListener("input", (e) => {
                     const target = e.target as HTMLInputElement;
                     const key = target.dataset.key!;
-                    const val = target.value;
+                    let val: string | boolean = target.value;
+
+                    if (target.type === "checkbox") {
+                        val = target.checked;
+                    }
 
                     // Sync siblings if it is a color picker
                     if (target.classList.contains("prop-color")) {
@@ -192,7 +233,7 @@
                             target.parentElement?.nextElementSibling?.querySelector(
                                 "span",
                             );
-                        if (labelSpan) labelSpan.textContent = val;
+                        if (labelSpan) labelSpan.textContent = String(val);
                     }
 
                     // Sync Range <-> Number
@@ -200,13 +241,13 @@
                         const numInput = panel.querySelector(
                             `.prop-input[data-key="${key}"][type="number"]`,
                         ) as HTMLInputElement;
-                        if (numInput) numInput.value = val;
+                        if (numInput) numInput.value = String(val);
                     }
                     if (target.type === "number") {
                         const rangeInput = panel.querySelector(
                             `.prop-input-range[data-key="${key}"]`,
                         ) as HTMLInputElement;
-                        if (rangeInput) rangeInput.value = val;
+                        if (rangeInput) rangeInput.value = String(val);
                     }
 
                     obj.updateProperties({ [key]: val });
@@ -222,6 +263,125 @@
             delBtn.addEventListener("click", () => {
                 (window as any).studioEngine.removeObject(obj.id);
             });
+        }
+
+        // --- Chart Data Editor Logic ---
+        const dataListContainer = panel.querySelector("#chart-data-list");
+        const hiddenJsonInput = panel.querySelector(
+            ".prop-input-data-json",
+        ) as HTMLTextAreaElement;
+        const btnAddData = panel.querySelector("#btn-add-data");
+
+        if (dataListContainer && hiddenJsonInput && btnAddData) {
+            let data: any[] = [];
+            try {
+                data = JSON.parse(hiddenJsonInput.value);
+            } catch (e) {
+                data = [];
+            }
+
+            const renderList = () => {
+                dataListContainer.innerHTML = "";
+                data.forEach((item, index) => {
+                    const row = document.createElement("div");
+                    row.className = "flex items-center gap-2 group/row";
+
+                    // Color Picker
+                    row.innerHTML = `
+                        <div class="relative w-6 h-6 rounded overflow-hidden ring-1 ring-gray-200 dark:ring-gray-700 shrink-0">
+                            <input type="color" 
+                                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] p-0 border-0 cursor-pointer data-color-input" 
+                                value="${item.color || "#3b82f6"}" 
+                                data-index="${index}"
+                            >
+                        </div>
+                        <input type="text" 
+                            class="flex-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-xs text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 outline-none data-label-input" 
+                            value="${item.label}" 
+                            data-index="${index}"
+                            placeholder="Label"
+                        >
+                        <input type="number" 
+                            class="w-16 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-xs text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 outline-none data-value-input" 
+                            value="${item.value}" 
+                            data-index="${index}"
+                            placeholder="Val"
+                        >
+                        <button class="text-gray-400 hover:text-red-500 p-1 opacity-0 group-hover/row:opacity-100 transition-opacity data-delete-btn" data-index="${index}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    `;
+                    dataListContainer.appendChild(row);
+                });
+
+                // Re-bind listeners
+                bindListListeners();
+            };
+
+            const updateData = () => {
+                const json = JSON.stringify(data);
+                hiddenJsonInput.value = json;
+                obj.updateProperties({ data: json });
+                (window as any).studioEngine.draw(
+                    (window as any).studioEngine.currentTime,
+                );
+            };
+
+            const bindListListeners = () => {
+                // Color Inputs
+                dataListContainer
+                    .querySelectorAll(".data-color-input")
+                    .forEach((input: any) => {
+                        input.addEventListener("input", (e: any) => {
+                            const idx = parseInt(e.target.dataset.index);
+                            data[idx].color = e.target.value;
+                            updateData();
+                        });
+                    });
+
+                // Label Inputs
+                dataListContainer
+                    .querySelectorAll(".data-label-input")
+                    .forEach((input: any) => {
+                        input.addEventListener("input", (e: any) => {
+                            const idx = parseInt(e.target.dataset.index);
+                            data[idx].label = e.target.value;
+                            updateData();
+                        });
+                    });
+
+                // Value Inputs
+                dataListContainer
+                    .querySelectorAll(".data-value-input")
+                    .forEach((input: any) => {
+                        input.addEventListener("input", (e: any) => {
+                            const idx = parseInt(e.target.dataset.index);
+                            data[idx].value = parseFloat(e.target.value) || 0;
+                            updateData();
+                        });
+                    });
+
+                // Delete Buttons
+                dataListContainer
+                    .querySelectorAll(".data-delete-btn")
+                    .forEach((btn: any) => {
+                        btn.addEventListener("click", (e: any) => {
+                            const idx = parseInt(e.currentTarget.dataset.index);
+                            data.splice(idx, 1);
+                            renderList();
+                            updateData();
+                        });
+                    });
+            };
+
+            btnAddData.addEventListener("click", () => {
+                data.push({ label: "New", value: 10, color: "#9ca3af" });
+                renderList();
+                updateData();
+            });
+
+            // Initial Render
+            renderList();
         }
     }
 </script>

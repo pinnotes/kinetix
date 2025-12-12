@@ -500,7 +500,7 @@ import LayersPanel from "../components/studio/LayersPanel.astro";
 <script>
     import { StudioEngine } from "../utils/studio/StudioEngine";
     import { CanvasText } from "../utils/studio/renderers/CanvasText";
-    import { CanvasBarChart } from "../utils/studio/renderers/CanvasBarChart";
+    import { CanvasChart } from "../utils/studio/renderers/CanvasChart";
     import { CanvasImage } from "../utils/studio/renderers/CanvasImage";
     import { CanvasProgress } from "../utils/studio/renderers/CanvasProgress";
     import { CanvasCode } from "../utils/studio/renderers/CanvasCode";
@@ -544,7 +544,11 @@ import LayersPanel from "../components/studio/LayersPanel.astro";
             engine.addObject(new CanvasText(id, { x: cx - 200, y: cy }));
         } else if (type === "chart") {
             engine.addObject(
-                new CanvasBarChart(id, { x: cx - 200, y: cy - 150 }),
+                new CanvasChart(id, {
+                    x: cx - 200,
+                    y: cy - 150,
+                    chartType: "bar",
+                }),
             );
         } else if (type === "image") {
             engine.addObject(new CanvasImage(id, { x: cx - 200, y: cy - 150 }));
@@ -758,7 +762,13 @@ import LayersPanel from "../components/studio/LayersPanel.astro";
         toast?.classList.remove("hidden");
 
         try {
-            const format = formatSelect ? formatSelect.value : "video/webm";
+            // FIX: Explicitly prefer codecs if possible to ensure compatibility
+            let format = formatSelect ? formatSelect.value : "video/webm";
+
+            // If MP4 selected, try simple 'video/mp4', if that fails or is weird, we blindly rely on what user picked if supported
+            // No custom logic needed if MediaRecorder.isTypeSupported check above passed.
+
+            console.log("Exporting with format:", format);
 
             const url = await engine.exportVideo({
                 fps: 60,
@@ -774,14 +784,16 @@ import LayersPanel from "../components/studio/LayersPanel.astro";
 
             const a = document.createElement("a");
             a.href = url;
+            // FIX: extension logic based on string check
             const ext = format.includes("mp4") ? "mp4" : "webm";
             a.download = `kinetix-compose-${Date.now()}.${ext}`;
             a.click();
         } catch (e) {
             console.error(e);
-            alert("Export Failed");
+            alert("Export Failed: " + (e as Error).message);
         } finally {
             exportBtn.removeAttribute("disabled");
+
             exportBtn.classList.remove("opacity-50", "cursor-not-allowed");
             setTimeout(() => {
                 toast?.classList.add("hidden");
